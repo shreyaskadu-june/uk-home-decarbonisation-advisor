@@ -193,6 +193,7 @@
         <div class="kpi"><b id="k_save">–</b><span>Annual saving, selected measures</span></div>
         <div class="kpi"><b id="k_net">–</b><span>Net cost after grants</span></div>
         <div class="kpi"><b id="k_pay">–</b><span>Simple payback (years)</span></div>
+        <div class="kpi"><b id="k_co2">–</b><span>CO₂e saved, tonnes per year</span></div>
       </div>
 
       <h2>Annual saving by measure</h2>
@@ -200,13 +201,12 @@
 
       <div class="table-wrap">
         <table>
-          <thead><tr><th>Measure</th><th class="r">Saving £/yr</th><th class="r">Net cost £</th><th class="r">Payback yrs</th></tr></thead>
+          <thead><tr><th>Measure</th><th class="r">Saving £/yr</th><th class="r">Net cost £</th><th class="r">Payback yrs</th><th class="r">CO₂e t/yr</th></tr></thead>
           <tbody id="rows"></tbody>
         </table>
       </div>
 
-      <h2 style="margin-top:18px">Carbon</h2>
-      <p class="flag">Carbon results are off until the 2026 grid electricity and gas factors from the DESNZ GHG conversion factors are entered in the data file.</p>
+      <p class="note" style="margin-top:12px">Carbon uses the 2026 UK grid factor (0.131 kg CO₂e/kWh, generation basis, excluding transmission losses) and the natural gas factor (0.182 kg CO₂e/kWh, gross CV).</p>
 
       <details>
         <summary>Uncertainties and method</summary>
@@ -230,8 +230,9 @@
           <tr><td>Gas unit rate</td><td class="r">7.97p</td><td>Ofgem price cap, 1 Oct to 31 Dec 2026</td><td>Sourced</td></tr>
           <tr><td>Heat pump grant</td><td class="r">£7,500</td><td>gov.uk Boiler Upgrade Scheme notice (from 21 July 2026)</td><td>Sourced; eligibility to confirm</td></tr>
           <tr><td>Insulation savings</td><td class="r">£270 / £280</td><td>Energy Saving Trust home insulation guide (Jan 2024)</td><td>Sourced, scaled</td></tr>
+          <tr><td>Grid electricity carbon factor</td><td class="r">0.131 kg/kWh</td><td>DESNZ GHG conversion factors 2026, UK electricity (generation)</td><td>Sourced</td></tr>
+          <tr><td>Natural gas carbon factor</td><td class="r">0.182 kg/kWh</td><td>DESNZ GHG conversion factors 2026, Fuels, natural gas (gross CV)</td><td>Sourced</td></tr>
           <tr><td>Typical consumption, SCOP, yield, export tariff, installed costs</td><td class="r">placeholder</td><td>Not yet sourced</td><td class="flag">Placeholder</td></tr>
-          <tr><td>Grid electricity and gas carbon factors</td><td class="r">not entered</td><td>DESNZ GHG conversion factors 2026</td><td class="flag">Pending</td></tr>
         </tbody>
       </table>
     </div>
@@ -247,6 +248,8 @@
   var INSUL_2024 = { loft: 270, cavity: 280 };
   var GAS_2024_P = 0.07;
   var NAMES = ['Heat pump', 'Solar PV', 'Loft insulation', 'Cavity wall'];
+  // DESNZ GHG conversion factors 2026 (full set workbook): UK electricity generation, kg CO2e/kWh; natural gas kWh gross CV
+  var CO2_GRID = 0.13096, CO2_GAS = 0.18231;
 
   function num(id) { return parseFloat($(id).value); }
 
@@ -259,19 +262,20 @@
     var heatDemand = gasKwh * BOILER_EFF;
     var hpElec = heatDemand / scop;
     var hpSave = gasKwh * gasP - hpElec * elecP;
+    var hpCo2 = gasKwh * CO2_GAS - hpElec * CO2_GRID; // kg CO2e saved per year
     var hpCost = num('hpCost');
-    out.hp = { save: hpSave, cost: hpCost, net: Math.max(0, hpCost - GRANT_HP) };
+    out.hp = { save: hpSave, co2: hpCo2, cost: hpCost, net: Math.max(0, hpCost - GRANT_HP) };
 
     var kwp = num('kwp'), gen = kwp * num('yield');
     var selfGen = gen * num('selfShare') / 100, exp = gen - selfGen;
     var solSave = selfGen * elecP + exp * num('exportP') / 100;
     var solCost = kwp * num('solCost');
-    out.solar = { save: solSave, cost: solCost, net: solCost };
+    out.solar = { save: solSave, co2: gen * CO2_GRID, cost: solCost, net: solCost };
 
     var loftSave = INSUL_2024.loft / GAS_2024_P * gasP;
-    out.loft = { save: loftSave, cost: num('loftCost'), net: num('loftCost') };
+    out.loft = { save: loftSave, co2: INSUL_2024.loft / GAS_2024_P * CO2_GAS, cost: num('loftCost'), net: num('loftCost') };
     var cavSave = INSUL_2024.cavity / GAS_2024_P * gasP;
-    out.cavity = { save: cavSave, cost: num('cavCost'), net: num('cavCost') };
+    out.cavity = { save: cavSave, co2: INSUL_2024.cavity / GAS_2024_P * CO2_GAS, cost: num('cavCost'), net: num('cavCost') };
 
     return out;
   }
@@ -303,7 +307,7 @@
 
     var r = calc();
     var keys = ['hp', 'solar', 'loft', 'cavity'];
-    var tot = { save: 0, net: 0 };
+    var tot = { save: 0, net: 0, co2: 0 };
     var maxAbs = 1;
     keys.forEach(function (k) { if (m[k]) maxAbs = Math.max(maxAbs, Math.abs(r[k].save)); });
 
@@ -315,8 +319,9 @@
         '<div class="track"><div class="fill' + (d.save < 0 ? ' neg' : '') + '" style="width:' + w.toFixed(1) + '%"></div></div>' +
         '<span class="num">' + (on ? fmt(d.save) : 'off') + '</span></div>';
       rows += '<tr><td>' + NAMES[i] + '</td><td class="r">' + (on ? fmt(d.save) : '–') + '</td>' +
-        '<td class="r">' + (on ? fmt(d.net) : '–') + '</td><td class="r">' + (on ? pay(d.net, d.save) : '–') + '</td></tr>';
-      if (on) { tot.save += d.save; tot.net += d.net; }
+        '<td class="r">' + (on ? fmt(d.net) : '–') + '</td><td class="r">' + (on ? pay(d.net, d.save) : '–') + '</td>' +
+        '<td class="r">' + (on ? (d.co2 / 1000).toFixed(2) : '–') + '</td></tr>';
+      if (on) { tot.save += d.save; tot.net += d.net; tot.co2 += d.co2; }
     });
     $('bars').innerHTML = bars;
     $('rows').innerHTML = rows;
@@ -324,6 +329,7 @@
     $('k_save').textContent = fmt(tot.save);
     $('k_net').textContent = fmt(tot.net);
     $('k_pay').textContent = tot.save > 0 ? (tot.net / tot.save).toFixed(1) : '–';
+    $('k_co2').textContent = (tot.co2 / 1000).toFixed(2);
   }
 
   var inputs = document.querySelectorAll('input');
