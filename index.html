@@ -94,13 +94,13 @@
       <h2>Your home</h2>
       <div class="ctrl">
         <label for="gasKwh">Gas use per year <output id="o_gas"></output></label>
-        <input type="range" id="gasKwh" min="2000" max="25000" step="100" value="11500">
-        <p class="src ph">Placeholder typical value. Ofgem typical consumption not yet confirmed.</p>
+        <input type="range" id="gasKwh" min="2000" max="25000" step="100" value="9500">
+        <p class="src">Ofgem typical domestic consumption value (dual fuel, from 1 July 2026): 9,500 kWh gas.</p>
       </div>
       <div class="ctrl">
         <label for="elecKwh">Electricity use per year <output id="o_elec"></output></label>
-        <input type="range" id="elecKwh" min="1000" max="8000" step="50" value="2700">
-        <p class="src ph">Placeholder typical value.</p>
+        <input type="range" id="elecKwh" min="1000" max="8000" step="50" value="2500">
+        <p class="src">Ofgem typical domestic consumption value (dual fuel, from 1 July 2026): 2,500 kWh electricity.</p>
       </div>
 
       <h2 style="margin-top:18px">Prices (1 Oct to 31 Dec 2026)</h2>
@@ -127,8 +127,8 @@
         <h3>Heat pump (air source)</h3>
         <div class="ctrl">
           <label for="scop">Seasonal efficiency (SCOP) <output id="o_scop"></output></label>
-          <input type="range" id="scop" min="2" max="4" step="0.05" value="3">
-          <p class="src ph">Placeholder. Needs a UK field-trial source (e.g. DESNZ heat pump monitoring).</p>
+          <input type="range" id="scop" min="2" max="4" step="0.05" value="2.45">
+          <p class="src">Default 2.45: mean seasonal performance of air source heat pumps in the Energy Saving Trust field trial, Phase II (gov.uk, 2013; old systems). Newer UK data (RECC/GSHPA, installations 2017 to 2022): about 30% reach SPF 3.0 or more, but no mean is published. Treat as a range.</p>
         </div>
         <div class="ctrl">
           <label for="hpCost">Installed cost (£) <output id="o_hpCost"></output></label>
@@ -156,8 +156,8 @@
         </div>
         <div class="ctrl">
           <label for="exportP">Export tariff (p/kWh) <output id="o_exp"></output></label>
-          <input type="range" id="exportP" min="0" max="20" step="0.5" value="15">
-          <p class="src ph">Placeholder. Not yet sourced.</p>
+          <input type="range" id="exportP" min="0" max="20" step="0.01" value="14.04">
+          <p class="src">Average Smart Export Guarantee rate paid, SEG year 5 (April 2024 to March 2025), Ofgem annual report.</p>
         </div>
         <div class="ctrl">
           <label for="solCost">Installed cost (£ per kWp) <output id="o_solCost"></output></label>
@@ -232,7 +232,10 @@
           <tr><td>Insulation savings</td><td class="r">£270 / £280</td><td>Energy Saving Trust home insulation guide (Jan 2024)</td><td>Sourced, scaled</td></tr>
           <tr><td>Grid electricity carbon factor</td><td class="r">0.131 kg/kWh</td><td>DESNZ GHG conversion factors 2026, UK electricity (generation)</td><td>Sourced</td></tr>
           <tr><td>Natural gas carbon factor</td><td class="r">0.182 kg/kWh</td><td>DESNZ GHG conversion factors 2026, Fuels, natural gas (gross CV)</td><td>Sourced</td></tr>
-          <tr><td>Typical consumption, SCOP, yield, export tariff, installed costs</td><td class="r">placeholder</td><td>Not yet sourced</td><td class="flag">Placeholder</td></tr>
+          <tr><td>Typical household consumption</td><td class="r">9,500 kWh gas; 2,500 kWh electricity</td><td>Ofgem TDCV, from 1 July 2026</td><td>Sourced</td></tr>
+          <tr><td>Heat pump efficiency (SCOP/SPF)</td><td class="r">2.45 (default)</td><td>Energy Saving Trust field trial Phase II (2013, mean SPFH4); RECC/GSHPA 2017–2022 installs: about 30% at SPF 3.0 or more</td><td class="flag">Dated; needs newer mean</td></tr>
+          <tr><td>Export tariff</td><td class="r">14.04p/kWh</td><td>Ofgem SEG annual report, year 5 (April 2024 to March 2025), average paid</td><td>Sourced</td></tr>
+          <tr><td>Solar yield, self-use share, installed costs (heat pump, solar, insulation)</td><td class="r">placeholder</td><td>Not yet sourced: government data files could not be opened from this environment</td><td class="flag">Placeholder</td></tr>
         </tbody>
       </table>
     </div>

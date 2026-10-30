@@ -18,3 +18,15 @@ Last checked: 30 October 2026.
 | Heat pump, solar, insulation capex and performance | Not yet researched | - | OPEN |
 
 Open question on the grant: the notice lists "property not off-gas grid" as the default category; confirm which homes are eligible before using a grant value in results.
+
+## Placeholder sourcing (30 October 2026)
+
+| Input | Value | Source | Status |
+|---|---|---|---|
+| Typical household consumption | 9,500 kWh gas; 2,500 kWh electricity | Ofgem revised TDCV, effective 1 July 2026 (Summary of changes, 1 July to 30 September 2026) | Sourced |
+| Heat pump SCOP/SPF | Mean 2.45 (SPFH4, incl. auxiliary heat) | Energy Saving Trust field trial Phase II, gov.uk analysis (7 Aug 2013) | Sourced but dated; pre-MCS systems included |
+| Heat pump in-situ performance | About 30% of ASHPs at SPF 3.0+; 8% at 3.5+; design-to-SPF gap 1.04 (2022 installs) | RECC/GSHPA study, 1,400 ASHP installs, 2017–2022 | Sourced; no mean published |
+| Export tariff | 14.04p/kWh average | Ofgem SEG annual report year 5 (April 2024 to March 2025) | Sourced |
+| Solar yield (kWh/kWp) | Not sourced | PVGIS (EU JRC) not reachable from this environment | Placeholder |
+| Self-use share | Not sourced | - | Placeholder |
+| Installed costs (heat pump, solar £/kWp, insulation) | Not sourced | DESNZ solar PV cost dataset 2025-26 (xlsx) and heat pump cost evidence not reachable | Placeholder |
