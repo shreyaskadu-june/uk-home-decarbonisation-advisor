@@ -131,9 +131,9 @@
           <p class="src">Default 2.45: mean seasonal performance of air source heat pumps in the Energy Saving Trust field trial, Phase II (gov.uk, 2013; old systems). Newer UK data (RECC/GSHPA, installations 2017 to 2022): about 30% reach SPF 3.0 or more, but no mean is published. Treat as a range.</p>
         </div>
         <div class="ctrl">
-          <label for="hpCost">Installed cost (£) <output id="o_hpCost"></output></label>
+          <label for="hpCost">Extra cost over a gas boiler (£) <output id="o_hpCost"></output></label>
           <input type="range" id="hpCost" min="3000" max="20000" step="100" value="9000">
-          <p class="src ph">Placeholder. Not yet sourced.</p>
+          <p class="src">Default £9,000: DESNZ RAF061/2223 (2024), extra upfront cost of an air source heat pump over a conventional boiler for an average gas-heated home, before the £7,500 grant.</p>
         </div>
         <p class="src">Grant: £7,500 Boiler Upgrade Scheme for air-to-water (gov.uk, from 21 July 2026). Eligibility to confirm.</p>
       </div>
@@ -161,8 +161,8 @@
         </div>
         <div class="ctrl">
           <label for="solCost">Installed cost (£ per kWp) <output id="o_solCost"></output></label>
-          <input type="range" id="solCost" min="800" max="2500" step="10" value="1500">
-          <p class="src ph">Placeholder. The DESNZ 2025-26 solar cost dataset (published 28 May 2026) is the source to confirm this.</p>
+          <input type="range" id="solCost" min="800" max="2500" step="10" value="2008">
+          <p class="src">Default £2,008/kWp: mean cost of 0–4 kW installs, 2025/26 (DESNZ small-scale solar cost statistics, May 2026, declared net capacity basis). The median is £1,780/kWp. Excludes batteries.</p>
         </div>
       </div>
 
@@ -235,7 +235,9 @@
           <tr><td>Typical household consumption</td><td class="r">9,500 kWh gas; 2,500 kWh electricity</td><td>Ofgem TDCV, from 1 July 2026</td><td>Sourced</td></tr>
           <tr><td>Heat pump efficiency (SCOP/SPF)</td><td class="r">2.45 (default)</td><td>Energy Saving Trust field trial Phase II (2013, mean SPFH4); RECC/GSHPA 2017–2022 installs: about 30% at SPF 3.0 or more</td><td class="flag">Dated; needs newer mean</td></tr>
           <tr><td>Export tariff</td><td class="r">14.04p/kWh</td><td>Ofgem SEG annual report, year 5 (April 2024 to March 2025), average paid</td><td>Sourced</td></tr>
-          <tr><td>Solar yield, self-use share, installed costs (heat pump, solar, insulation)</td><td class="r">placeholder</td><td>Not yet sourced: government data files could not be opened from this environment</td><td class="flag">Placeholder</td></tr>
+          <tr><td>Solar installed cost</td><td class="r">£2,008/kWp</td><td>DESNZ small-scale solar PV cost statistics, 2025/26 mean, 0–4 kW, DNC basis (28 May 2026)</td><td>Sourced</td></tr>
+          <tr><td>Heat pump extra cost over a boiler</td><td class="r">£9,000</td><td>DESNZ RAF061/2223 Impact of Heat Pump Costs on Uptake (2024), before the £7,500 BUS grant</td><td>Sourced; survey-based, not installer prices</td></tr>
+          <tr><td>Solar yield, self-use share, loft and cavity costs</td><td class="r">placeholder</td><td>Not yet sourced. The EC PVGIS 5.3 report documents the dataset but gives no UK yield per kWp; a PVGIS run for a location is needed</td><td class="flag">Placeholder</td></tr>
         </tbody>
       </table>
     </div>

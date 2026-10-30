@@ -30,3 +30,14 @@ Open question on the grant: the notice lists "property not off-gas grid" as the 
 | Solar yield (kWh/kWp) | Not sourced | PVGIS (EU JRC) not reachable from this environment | Placeholder |
 | Self-use share | Not sourced | - | Placeholder |
 | Installed costs (heat pump, solar £/kWp, insulation) | Not sourced | DESNZ solar PV cost dataset 2025-26 (xlsx) and heat pump cost evidence not reachable | Placeholder |
+
+## Sourced from documents supplied by the user (30 October 2026)
+
+| Input | Value | Source | Status |
+|---|---|---|---|
+| Solar installed cost, 0–4 kW | Mean £2,008/kW, median £1,780/kW (2025/26, nominal, DNC) | DESNZ Average costs of small-scale solar PV, DNC, May 2026 (Summary table) | Sourced. Excludes batteries. TIC-based costs are 6–12% lower |
+| Heat pump extra cost over a gas boiler | £9,000 (average home on gas, before grant) | DESNZ RAF061/2223, Impact of Heat Pump Costs on Uptake (2024), section 1 | Sourced; survey-based, not installer prices |
+| Solar yield (kWh/kWp) | Not in the PVGIS 5.3 report | EC JRC PVGIS 5.3 Dataset Update (2024) | Open: needs a PVGIS run for a UK location |
+| Loft and cavity costs | Not in any supplied document | - | Open |
+| Heat pump SPF | Not in the supplied documents | - | Open |
+| Liquid hydrogen cooldown | Not in the NBS 1966 Technical Highlights (supplied file is the annual highlights, not NBS 9264) | - | Open: needs the NBS 9264 cooldown report |
