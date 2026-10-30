@@ -1,0 +1,338 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Home Decarbonisation Advisor</title>
+<style>
+  :root {
+    --bg: #0b1210;
+    --panel: #111b18;
+    --line: #1f2e29;
+    --ink: #e6f2ed;
+    --muted: #8aa39a;
+    --accent: #5ee0b0;
+    --accent-2: #f2b84b;
+    --warn: #ff8a70;
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --bg: #f2f7f4; --panel: #ffffff; --line: #d4e2dc; --ink: #10201a; --muted: #4d6a60;
+      --accent: #0f8a62; --accent-2: #a86b00; --warn: #b8432a; color-scheme: light;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0b1210; --panel: #111b18; --line: #1f2e29; --ink: #e6f2ed; --muted: #8aa39a;
+    --accent: #5ee0b0; --accent-2: #f2b84b; --warn: #ff8a70; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 24px 16px 48px; }
+  header h1 { font-size: 26px; margin: 4px 0 6px; letter-spacing: -0.01em; }
+  .tag { font: 600 12px/1 ui-monospace, Menlo, monospace; color: var(--accent); text-transform: uppercase; letter-spacing: .12em; }
+  .lede { color: var(--muted); max-width: 70ch; margin: 0 0 18px; }
+  .grid { display: grid; grid-template-columns: minmax(0,1fr); gap: 16px; }
+  @media (min-width: 860px) { .grid { grid-template-columns: minmax(0,360px) minmax(0,1fr); } }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; min-width: 0; }
+  .card h2 { font-size: 14px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .ctrl { margin: 12px 0; }
+  .ctrl label { display: flex; justify-content: space-between; font-size: 14px; }
+  .ctrl output { font: 500 14px ui-monospace, Menlo, monospace; color: var(--accent); }
+  input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+  .src { font-size: 12px; color: var(--muted); margin: 2px 0 0; }
+  .src.ph { color: var(--accent-2); }
+  .toggles { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toggles label {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px;
+    border: 1px solid var(--line); cursor: pointer; user-select: none; font-size: 14px;
+  }
+  .toggles input { accent-color: var(--accent); }
+  .measure { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-top: 12px; }
+  .measure.off { opacity: .45; }
+  .measure h3 { margin: 0 0 6px; font-size: 16px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  .kpi { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+  .kpi b { display: block; font: 600 22px ui-monospace, Menlo, monospace; color: var(--accent); }
+  .kpi span { font-size: 12px; color: var(--muted); }
+  .bars { display: grid; gap: 10px; margin: 8px 0 16px; }
+  .bar-row { display: grid; grid-template-columns: minmax(0,130px) minmax(0,1fr) 84px; gap: 10px; align-items: center; font-size: 14px; }
+  .track { height: 14px; background: var(--line); border-radius: 7px; overflow: hidden; }
+  .fill { height: 100%; width: 0; background: var(--accent); border-radius: 7px; transition: width .35s ease; }
+  .fill.neg { background: var(--warn); }
+  .num { font: 500 13px ui-monospace, Menlo, monospace; text-align: right; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
+  td.r { text-align: right; font-family: ui-monospace, Menlo, monospace; }
+  .note { font-size: 13px; color: var(--muted); }
+  .flag { color: var(--warn); font-size: 13px; }
+  .table-wrap { overflow-x: auto; }
+  button.btn {
+    font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 10px; cursor: pointer;
+    background: var(--accent); color: #05140e; border: 0;
+  }
+  button.btn:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  details { margin-top: 14px; }
+  summary { cursor: pointer; color: var(--accent); }
+  @media (prefers-reduced-motion: reduce) { .fill { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="tag">Home decarbonisation advisor · UK · GBP</div>
+    <h1>What would each measure do to your bills?</h1>
+    <p class="lede">Adjust your home, prices and measures. Each measure shows its change in annual running cost, its net cost after grants, and a simple payback. Orange text marks placeholder values that still need a UK source.</p>
+  </header>
+
+  <div class="grid">
+    <section class="card" aria-label="Inputs">
+      <h2>Your home</h2>
+      <div class="ctrl">
+        <label for="gasKwh">Gas use per year <output id="o_gas"></output></label>
+        <input type="range" id="gasKwh" min="2000" max="25000" step="100" value="11500">
+        <p class="src ph">Placeholder typical value. Ofgem typical consumption not yet confirmed.</p>
+      </div>
+      <div class="ctrl">
+        <label for="elecKwh">Electricity use per year <output id="o_elec"></output></label>
+        <input type="range" id="elecKwh" min="1000" max="8000" step="50" value="2700">
+        <p class="src ph">Placeholder typical value.</p>
+      </div>
+
+      <h2 style="margin-top:18px">Prices (1 Oct to 31 Dec 2026)</h2>
+      <div class="ctrl">
+        <label for="elecP">Electricity unit rate <output id="o_elecP"></output></label>
+        <input type="range" id="elecP" min="5" max="45" step="0.01" value="26.32">
+        <p class="src">Ofgem default tariff, GB average, excl. VAT (0% VAT on electricity this period).</p>
+      </div>
+      <div class="ctrl">
+        <label for="gasP">Gas unit rate <output id="o_gasP"></output></label>
+        <input type="range" id="gasP" min="2" max="20" step="0.01" value="7.97">
+        <p class="src">Ofgem default tariff, GB average, incl. 5% VAT.</p>
+      </div>
+
+      <h2 style="margin-top:18px">Measures</h2>
+      <div class="toggles" role="group" aria-label="Choose measures">
+        <label><input type="checkbox" id="m_hp" checked> Heat pump</label>
+        <label><input type="checkbox" id="m_solar" checked> Solar PV</label>
+        <label><input type="checkbox" id="m_loft" checked> Loft insulation</label>
+        <label><input type="checkbox" id="m_cavity" checked> Cavity wall</label>
+      </div>
+
+      <div class="measure" id="box_hp">
+        <h3>Heat pump (air source)</h3>
+        <div class="ctrl">
+          <label for="scop">Seasonal efficiency (SCOP) <output id="o_scop"></output></label>
+          <input type="range" id="scop" min="2" max="4" step="0.05" value="3">
+          <p class="src ph">Placeholder. Needs a UK field-trial source (e.g. DESNZ heat pump monitoring).</p>
+        </div>
+        <div class="ctrl">
+          <label for="hpCost">Installed cost (£) <output id="o_hpCost"></output></label>
+          <input type="range" id="hpCost" min="3000" max="20000" step="100" value="9000">
+          <p class="src ph">Placeholder. Not yet sourced.</p>
+        </div>
+        <p class="src">Grant: £7,500 Boiler Upgrade Scheme for air-to-water (gov.uk, from 21 July 2026). Eligibility to confirm.</p>
+      </div>
+
+      <div class="measure" id="box_solar">
+        <h3>Solar PV with export</h3>
+        <div class="ctrl">
+          <label for="kwp">System size (kWp) <output id="o_kwp"></output></label>
+          <input type="range" id="kwp" min="1" max="10" step="0.1" value="4">
+        </div>
+        <div class="ctrl">
+          <label for="selfShare">Share used in the home <output id="o_self"></output></label>
+          <input type="range" id="selfShare" min="10" max="90" step="1" value="40">
+          <p class="src ph">Placeholder. Depends on occupancy and any battery.</p>
+        </div>
+        <div class="ctrl">
+          <label for="yield">Yield (kWh per kWp per year) <output id="o_yield"></output></label>
+          <input type="range" id="yield" min="700" max="1100" step="10" value="850">
+          <p class="src ph">Placeholder. Needs a UK source (e.g. PVGIS or MCS).</p>
+        </div>
+        <div class="ctrl">
+          <label for="exportP">Export tariff (p/kWh) <output id="o_exp"></output></label>
+          <input type="range" id="exportP" min="0" max="20" step="0.5" value="15">
+          <p class="src ph">Placeholder. Not yet sourced.</p>
+        </div>
+        <div class="ctrl">
+          <label for="solCost">Installed cost (£ per kWp) <output id="o_solCost"></output></label>
+          <input type="range" id="solCost" min="800" max="2500" step="10" value="1500">
+          <p class="src ph">Placeholder. The DESNZ 2025-26 solar cost dataset (published 28 May 2026) is the source to confirm this.</p>
+        </div>
+      </div>
+
+      <div class="measure" id="box_loft">
+        <h3>Loft insulation top-up</h3>
+        <p class="src">Saving £270/yr at 2024 prices (Energy Saving Trust, Jan 2024), converted to current gas price using its 7p/kWh assumption.</p>
+        <div class="ctrl">
+          <label for="loftCost">Installed cost (£) <output id="o_loftCost"></output></label>
+          <input type="range" id="loftCost" min="0" max="1500" step="10" value="400">
+          <p class="src ph">Placeholder. Not yet sourced.</p>
+        </div>
+      </div>
+
+      <div class="measure" id="box_cavity">
+        <h3>Cavity wall insulation</h3>
+        <p class="src">Saving £280/yr at 2024 prices (Energy Saving Trust, Jan 2024), converted to current gas price using its 7p/kWh assumption.</p>
+        <div class="ctrl">
+          <label for="cavCost">Installed cost (£) <output id="o_cavCost"></output></label>
+          <input type="range" id="cavCost" min="0" max="2500" step="10" value="700">
+          <p class="src ph">Placeholder. Not yet sourced.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" aria-label="Results">
+      <h2>Results</h2>
+      <div class="kpis">
+        <div class="kpi"><b id="k_save">–</b><span>Annual saving, selected measures</span></div>
+        <div class="kpi"><b id="k_net">–</b><span>Net cost after grants</span></div>
+        <div class="kpi"><b id="k_pay">–</b><span>Simple payback (years)</span></div>
+      </div>
+
+      <h2>Annual saving by measure</h2>
+      <div class="bars" id="bars"></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Measure</th><th class="r">Saving £/yr</th><th class="r">Net cost £</th><th class="r">Payback yrs</th></tr></thead>
+          <tbody id="rows"></tbody>
+        </table>
+      </div>
+
+      <h2 style="margin-top:18px">Carbon</h2>
+      <p class="flag">Carbon results are off until the 2026 grid electricity and gas factors from the DESNZ GHG conversion factors are entered in the data file.</p>
+
+      <details>
+        <summary>Uncertainties and method</summary>
+        <ul class="note">
+          <li>Heat pump running cost = electricity used (heat demand ÷ SCOP) × electricity price, minus the gas it replaces (gas use × boiler efficiency assumed 88%, from the gas bill). Standing charges are not included in the comparison.</li>
+          <li>Solar saving = self-used generation × electricity price + exported generation × export tariff. No battery is modelled.</li>
+          <li>Insulation savings are at 2024 prices and scaled to current gas prices, so they carry the 2024 house assumptions (three-bedroom semi, gas boiler).</li>
+          <li>Payback ignores price changes, maintenance and boiler replacement timing, and assumes the grant applies.</li>
+        </ul>
+      </details>
+    </section>
+  </div>
+
+  <section class="card" style="margin-top:16px" aria-label="Sources">
+    <h2>Sources and status</h2>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Input</th><th>Value</th><th>Source</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Electricity unit rate</td><td class="r">26.32p</td><td>Ofgem price cap, 1 Oct to 31 Dec 2026</td><td>Sourced</td></tr>
+          <tr><td>Gas unit rate</td><td class="r">7.97p</td><td>Ofgem price cap, 1 Oct to 31 Dec 2026</td><td>Sourced</td></tr>
+          <tr><td>Heat pump grant</td><td class="r">£7,500</td><td>gov.uk Boiler Upgrade Scheme notice (from 21 July 2026)</td><td>Sourced; eligibility to confirm</td></tr>
+          <tr><td>Insulation savings</td><td class="r">£270 / £280</td><td>Energy Saving Trust home insulation guide (Jan 2024)</td><td>Sourced, scaled</td></tr>
+          <tr><td>Typical consumption, SCOP, yield, export tariff, installed costs</td><td class="r">placeholder</td><td>Not yet sourced</td><td class="flag">Placeholder</td></tr>
+          <tr><td>Grid electricity and gas carbon factors</td><td class="r">not entered</td><td>DESNZ GHG conversion factors 2026</td><td class="flag">Pending</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var BOILER_EFF = 0.88;
+  var GRANT_HP = 7500;
+  var INSUL_2024 = { loft: 270, cavity: 280 };
+  var GAS_2024_P = 0.07;
+  var NAMES = ['Heat pump', 'Solar PV', 'Loft insulation', 'Cavity wall'];
+
+  function num(id) { return parseFloat($(id).value); }
+
+  function calc() {
+    var gasKwh = num('gasKwh'), elecKwh = num('elecKwh');
+    var elecP = num('elecP') / 100, gasP = num('gasP') / 100;
+    var scop = num('scop');
+    var out = {};
+
+    var heatDemand = gasKwh * BOILER_EFF;
+    var hpElec = heatDemand / scop;
+    var hpSave = gasKwh * gasP - hpElec * elecP;
+    var hpCost = num('hpCost');
+    out.hp = { save: hpSave, cost: hpCost, net: Math.max(0, hpCost - GRANT_HP) };
+
+    var kwp = num('kwp'), gen = kwp * num('yield');
+    var selfGen = gen * num('selfShare') / 100, exp = gen - selfGen;
+    var solSave = selfGen * elecP + exp * num('exportP') / 100;
+    var solCost = kwp * num('solCost');
+    out.solar = { save: solSave, cost: solCost, net: solCost };
+
+    var loftSave = INSUL_2024.loft / GAS_2024_P * gasP;
+    out.loft = { save: loftSave, cost: num('loftCost'), net: num('loftCost') };
+    var cavSave = INSUL_2024.cavity / GAS_2024_P * gasP;
+    out.cavity = { save: cavSave, cost: num('cavCost'), net: num('cavCost') };
+
+    return out;
+  }
+
+  function fmt(n) { return '£' + Math.round(n).toLocaleString('en-GB'); }
+  function pay(net, save) { return save > 0 ? (net / save).toFixed(1) : '–'; }
+
+  function render() {
+    // Keep output labels in step with sliders
+    $('o_gas').textContent = num('gasKwh').toLocaleString('en-GB') + ' kWh';
+    $('o_elec').textContent = num('elecKwh').toLocaleString('en-GB') + ' kWh';
+    $('o_elecP').textContent = num('elecP').toFixed(2) + 'p';
+    $('o_gasP').textContent = num('gasP').toFixed(2) + 'p';
+    $('o_scop').textContent = num('scop').toFixed(2);
+    $('o_hpCost').textContent = fmt(num('hpCost'));
+    $('o_kwp').textContent = num('kwp').toFixed(1) + ' kWp';
+    $('o_self').textContent = num('selfShare') + '%';
+    $('o_yield').textContent = num('yield') + ' kWh';
+    $('o_exp').textContent = num('exportP').toFixed(1) + 'p';
+    $('o_solCost').textContent = fmt(num('solCost')) + '/kWp';
+    $('o_loftCost').textContent = fmt(num('loftCost'));
+    $('o_cavCost').textContent = fmt(num('cavCost'));
+
+    var m = { hp: $('m_hp').checked, solar: $('m_solar').checked, loft: $('m_loft').checked, cavity: $('m_cavity').checked };
+    $('box_hp').classList.toggle('off', !m.hp);
+    $('box_solar').classList.toggle('off', !m.solar);
+    $('box_loft').classList.toggle('off', !m.loft);
+    $('box_cavity').classList.toggle('off', !m.cavity);
+
+    var r = calc();
+    var keys = ['hp', 'solar', 'loft', 'cavity'];
+    var tot = { save: 0, net: 0 };
+    var maxAbs = 1;
+    keys.forEach(function (k) { if (m[k]) maxAbs = Math.max(maxAbs, Math.abs(r[k].save)); });
+
+    var bars = '', rows = '';
+    keys.forEach(function (k, i) {
+      var on = m[k], d = r[k];
+      var w = on ? Math.min(100, Math.abs(d.save) / maxAbs * 100) : 0;
+      bars += '<div class="bar-row"><span>' + NAMES[i] + '</span>' +
+        '<div class="track"><div class="fill' + (d.save < 0 ? ' neg' : '') + '" style="width:' + w.toFixed(1) + '%"></div></div>' +
+        '<span class="num">' + (on ? fmt(d.save) : 'off') + '</span></div>';
+      rows += '<tr><td>' + NAMES[i] + '</td><td class="r">' + (on ? fmt(d.save) : '–') + '</td>' +
+        '<td class="r">' + (on ? fmt(d.net) : '–') + '</td><td class="r">' + (on ? pay(d.net, d.save) : '–') + '</td></tr>';
+      if (on) { tot.save += d.save; tot.net += d.net; }
+    });
+    $('bars').innerHTML = bars;
+    $('rows').innerHTML = rows;
+
+    $('k_save').textContent = fmt(tot.save);
+    $('k_net').textContent = fmt(tot.net);
+    $('k_pay').textContent = tot.save > 0 ? (tot.net / tot.save).toFixed(1) : '–';
+  }
+
+  var inputs = document.querySelectorAll('input');
+  for (var i = 0; i < inputs.length; i++) {
+    inputs[i].addEventListener('input', render);
+    inputs[i].addEventListener('change', render);
+  }
+  render();
+})();
+</script>
+</body>
+</html>
